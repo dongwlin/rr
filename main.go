@@ -39,7 +39,13 @@ var (
 		".idx": true,
 	}
 
-	episodeRegex = regexp.MustCompile(`- (\d{1,2}) |\[(\d{1,2})\]|E(\d{1,2})||EP(\d{1,2})|第(\d{1,2})集`)
+	episodeRegex = regexp.MustCompile(`` +
+		`- (\d{1,2}) ` +
+		`|\[(\d{1,2})\]` +
+		`|E(\d{1,2})` +
+		`|EP(\d{1,2})` +
+		`|第(\d{1,2})集`,
+	)
 )
 
 func main() {
