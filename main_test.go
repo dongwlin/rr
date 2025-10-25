@@ -47,3 +47,28 @@ func TestExtractEpisode(t *testing.T) {
 	}
 
 }
+
+func TestPadNumber(t *testing.T) {
+	type Case struct {
+		Num      string
+		Width    int
+		Expected string
+	}
+
+	cases := []Case{
+		{Num: "5", Width: 2, Expected: "05"},
+		{Num: "12", Width: 2, Expected: "12"},
+		{Num: "123", Width: 2, Expected: "123"},
+		{Num: "", Width: 3, Expected: "000"},
+		{Num: "0", Width: 2, Expected: "00"},
+		{Num: "7", Width: 1, Expected: "7"},
+		{Num: "7", Width: 0, Expected: "7"},
+		{Num: "007", Width: 5, Expected: "00007"},
+		{Num: "9", Width: -3, Expected: "9"},
+	}
+
+	for _, tc := range cases {
+		got := padNumber(tc.Num, tc.Width)
+		require.Equal(t, tc.Expected, got, "num=%q width=%d", tc.Num, tc.Width)
+	}
+}
