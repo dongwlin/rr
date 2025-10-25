@@ -72,3 +72,33 @@ func TestPadNumber(t *testing.T) {
 		require.Equal(t, tc.Expected, got, "num=%q width=%d", tc.Num, tc.Width)
 	}
 }
+func TestExtractOtherTags(t *testing.T) {
+	type Case struct {
+		Raw      string
+		Expected []string
+	}
+
+	cases := []Case{
+		{
+			Raw:      "[Lilith-Raws] Kubo-san wa Mob wo Yurusanai - 04 [Baha][WEB-DL][1080p][AVC AAC][CHT][MP4].mp4",
+			Expected: []string{"[Lilith-Raws]", "[Baha]", "[WEB-DL]", "[1080p]", "[AVC AAC]", "[CHT]", "[MP4]"},
+		},
+		{
+			Raw:      "[BeanSub&FZSD][Chainsaw_Man][02][GB][1080P][x264_AAC].mp4",
+			Expected: []string{"[BeanSub&FZSD]", "[Chainsaw_Man]", "[02]", "[GB]", "[1080P]", "[x264_AAC]"},
+		},
+		{
+			Raw:      "S01E07",
+			Expected: []string{},
+		},
+		{
+			Raw:      "",
+			Expected: []string{},
+		},
+	}
+
+	for _, tc := range cases {
+		got := extractOtherTags(tc.Raw)
+		require.Equal(t, tc.Expected, got, "raw=%q", tc.Raw)
+	}
+}
