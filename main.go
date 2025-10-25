@@ -101,12 +101,22 @@ func main() {
 		}
 
 		if *dryRun {
-			fmt.Printf("info: dry-run: move %s -> %s\n", name, newName)
+			fmt.Println("info: dry-run")
+			fmt.Printf("  from: %s\n", name)
+			fmt.Printf("  to  : %s\n", newName)
+			fmt.Println()
 		} else {
 			if err := safeMove(oldPath, newPath); err != nil {
-				fmt.Printf("error: failed to move file %s -> %s: %v\n", name, newName, err)
+				fmt.Println("error: failed to move")
+				fmt.Printf("  from: %s\n", name)
+				fmt.Printf("  to  : %s\n", newName)
+				fmt.Printf("  cause: %v\n", err)
+				fmt.Println()
 			} else {
-				fmt.Printf("success: moved %s -> %s\n", name, newName)
+				fmt.Println("success: moved")
+				fmt.Printf("  from: %s\n", name)
+				fmt.Printf("  to  : %s\n", newName)
+				fmt.Println()
 			}
 		}
 	}
