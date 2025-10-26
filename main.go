@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/dongwlin/rr/style"
 )
 
 var (
@@ -61,7 +63,10 @@ func main() {
 	}
 
 	if len(missing) > 0 {
-		fmt.Fprintf(os.Stderr, "error: Missing required parameters: %s\n", strings.Join(missing, ", "))
+		fmt.Fprintf(os.Stderr, "%s: missing required parameters: %s\n",
+			style.Error.Render("error"),
+			strings.Join(missing, ", "),
+		)
 		fmt.Fprintln(os.Stderr, "Usage:")
 		flag.PrintDefaults()
 		os.Exit(1)
@@ -69,12 +74,17 @@ func main() {
 
 	names, err := getDirFileNames(*inputDir)
 	if err != nil {
-		fmt.Printf("error: Failed to read directory contents: %v", err)
+		fmt.Printf("%s: failed to read directory contents: %v",
+			style.Error.Render("error"),
+			err,
+		)
 		os.Exit(1)
 	}
 
 	if len(names) == 0 {
-		fmt.Println("no matching files found")
+		fmt.Printf("%s: no matching files found\n",
+			style.Warning.Render("warning"),
+		)
 		return
 	}
 
@@ -83,37 +93,51 @@ func main() {
 		info := getNameInfo(name)
 
 		if info.Episode == -1 {
-			fmt.Printf("warning: cannot extract episode number, skipping: %s\n", name)
+			fmt.Printf("%s: cannot extract episode number, skipping: %s\n",
+				style.Warning.Render("warning"), name,
+			)
 			continue
 		}
 
 		newName := buildScrapedName(*showName, *season, info)
 		if newName == "" {
-			fmt.Printf("warning: failed to generate new filename, skipping: %s\n", name)
+			fmt.Printf("%s: failed to generate new filename, skipping: %s\n",
+				style.Warning.Render("warning"),
+				name,
+			)
 			continue
 		}
 
 		newPath := filepath.Join(*inputDir, newName)
 
 		if oldPath == newPath {
-			fmt.Printf("success: filename already correct, no change needed: %s\n", name)
+			fmt.Printf("%s: filename already correct, no change needed: %s\n",
+				style.Success.Render("success"),
+				name,
+			)
 			continue
 		}
 
 		if *dryRun {
-			fmt.Println("info: dry-run")
+			fmt.Printf("%s: dry-run\n",
+				style.Info.Render("info"),
+			)
 			fmt.Printf("  from: %s\n", name)
 			fmt.Printf("  to  : %s\n", newName)
 			fmt.Println()
 		} else {
 			if err := safeMove(oldPath, newPath); err != nil {
-				fmt.Println("error: failed to move")
+				fmt.Printf("%s: failed to move\n",
+					style.Error.Render("error"),
+				)
 				fmt.Printf("  from: %s\n", name)
 				fmt.Printf("  to  : %s\n", newName)
 				fmt.Printf("  cause: %v\n", err)
 				fmt.Println()
 			} else {
-				fmt.Println("success: moved")
+				fmt.Printf("%s: moved\n",
+					style.Success.Render("success"),
+				)
 				fmt.Printf("  from: %s\n", name)
 				fmt.Printf("  to  : %s\n", newName)
 				fmt.Println()
@@ -228,7 +252,9 @@ func padNumber(num string, width int) string {
 
 func safeMove(src, dst string) error {
 	if fileExists(dst) {
-		return fmt.Errorf("error: destination file already exists")
+		return fmt.Errorf("%s: destination file already exists",
+			style.Error.Render("error"),
+		)
 	}
 
 	if err := os.Rename(src, dst); err == nil {
