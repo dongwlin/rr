@@ -41,6 +41,8 @@ var (
 		".idx": true,
 	}
 
+	tagRegex = regexp.MustCompile(`\[.*?\]`)
+
 	episodeRegex = regexp.MustCompile(`` +
 		`- (\d{1,2}) ` +
 		`|\[(\d{1,2})\]` +
@@ -195,8 +197,7 @@ func extractOtherTags(rawName string) []string {
 
 	tags := make([]string, 0)
 
-	re := regexp.MustCompile(`\[.*?\]`)
-	matches := re.FindAllString(rawName, -1)
+	matches := tagRegex.FindAllString(rawName, -1)
 
 	tags = append(tags, matches...)
 
