@@ -16,7 +16,7 @@ var (
 	inputDir      = flag.String("input", ".", "Directory path to process")
 	dryRun        = flag.Bool("dry-run", false, "Preview operations without executing")
 	season        = flag.Int("season", 0, "Season number (required, no default)")      // Must be specified
-	showName      = flag.String("show", "", "Show series name (required, no default)") // Must be specified
+	show          = flag.String("show", "", "Show series name (required, no default)") // Must be specified
 	keepOtherTags = flag.Bool("keep-other-tags", true, "Preserve existing tags")
 	noColor       = flag.Bool("no-color", false, "Disable colored output")
 )
@@ -34,7 +34,7 @@ func main() {
 	if *season == 0 {
 		missing = append(missing, "-season")
 	}
-	if *showName == "" {
+	if *show == "" {
 		missing = append(missing, "-show")
 	}
 
@@ -75,7 +75,7 @@ func main() {
 			continue
 		}
 
-		newName := renamer.BuildScrapedName(*showName, *season, info, *keepOtherTags)
+		newName := renamer.BuildScrapedName(*show, *season, info, *keepOtherTags)
 		if newName == "" {
 			fmt.Printf("%s: failed to generate new filename, skipping: %s\n",
 				style.RenderWarning("warning"),
