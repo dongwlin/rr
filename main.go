@@ -69,28 +69,29 @@ func main() {
 		info := renamer.GetNameInfo(name)
 
 		if info.Episode == -1 {
-			fmt.Printf("%s: cannot extract episode number, skipping: %s\n",
-				style.RenderWarning("warning"), name,
+			fmt.Printf("%s: cannot extract episode number, skipping:\n",
+				style.RenderWarning("warning"),
 			)
+			fmt.Printf("  file: %s\n", name)
 			continue
 		}
 
 		newName := renamer.BuildScrapedName(*show, *season, info, *keepOtherTags)
 		if newName == "" {
-			fmt.Printf("%s: failed to generate new filename, skipping: %s\n",
+			fmt.Printf("%s: failed to generate new filename, skipping:\n",
 				style.RenderWarning("warning"),
-				name,
 			)
+			fmt.Printf("  file: %s\n", name)
 			continue
 		}
 
 		newPath := filepath.Join(*inputDir, newName)
 
 		if oldPath == newPath {
-			fmt.Printf("%s: filename already correct, no change needed: %s\n",
+			fmt.Printf("%s: filename already correct, no change needed:\n",
 				style.RenderSuccess("success"),
-				name,
 			)
+			fmt.Printf("  file: %s\n", name)
 			continue
 		}
 
