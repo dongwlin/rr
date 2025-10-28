@@ -9,7 +9,7 @@ import (
 
 	"github.com/dongwlin/rr/internal/renamer"
 
-	"github.com/dongwlin/rr/style"
+	"github.com/dongwlin/rr/internal/style"
 )
 
 var (
