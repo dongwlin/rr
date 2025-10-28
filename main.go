@@ -19,6 +19,7 @@ var (
 	season        = flag.Int("season", 0, "Season number (required, no default)")       // Must be specified
 	showName      = flag.String("show", "", "Anime series name (required, no default)") // Must be specified
 	keepOtherTags = flag.Bool("keep-other-tags", true, "Preserve existing tags")
+	noColor       = flag.Bool("no-color", false, "Disable colored output")
 )
 
 type NameInfo struct {
@@ -56,6 +57,11 @@ func main() {
 
 	flag.Parse()
 
+	// honor -no-color flag by disabling styled output
+	if *noColor {
+		style.DisableColor()
+	}
+
 	missing := []string{}
 	if *season == 0 {
 		missing = append(missing, "-season")
@@ -66,7 +72,7 @@ func main() {
 
 	if len(missing) > 0 {
 		fmt.Fprintf(os.Stderr, "%s: missing required parameters: %s\n",
-			style.Error.Render("error"),
+			style.RenderError("error"),
 			strings.Join(missing, ", "),
 		)
 		fmt.Fprintln(os.Stderr, "Usage:")
@@ -85,7 +91,7 @@ func main() {
 
 	if len(names) == 0 {
 		fmt.Printf("%s: no matching files found\n",
-			style.Warning.Render("warning"),
+			style.RenderWarning("warning"),
 		)
 		return
 	}
@@ -96,7 +102,7 @@ func main() {
 
 		if info.Episode == -1 {
 			fmt.Printf("%s: cannot extract episode number, skipping: %s\n",
-				style.Warning.Render("warning"), name,
+				style.RenderWarning("warning"), name,
 			)
 			continue
 		}
@@ -104,7 +110,7 @@ func main() {
 		newName := buildScrapedName(*showName, *season, info)
 		if newName == "" {
 			fmt.Printf("%s: failed to generate new filename, skipping: %s\n",
-				style.Warning.Render("warning"),
+				style.RenderWarning("warning"),
 				name,
 			)
 			continue
@@ -114,7 +120,7 @@ func main() {
 
 		if oldPath == newPath {
 			fmt.Printf("%s: filename already correct, no change needed: %s\n",
-				style.Success.Render("success"),
+				style.RenderSuccess("success"),
 				name,
 			)
 			continue
@@ -122,7 +128,7 @@ func main() {
 
 		if *dryRun {
 			fmt.Printf("%s: dry-run\n",
-				style.Info.Render("info"),
+				style.RenderInfo("info"),
 			)
 			fmt.Printf("  from: %s\n", name)
 			fmt.Printf("  to  : %s\n", newName)
@@ -130,7 +136,7 @@ func main() {
 		} else {
 			if err := safeMove(oldPath, newPath); err != nil {
 				fmt.Printf("%s: failed to move\n",
-					style.Error.Render("error"),
+					style.RenderError("error"),
 				)
 				fmt.Printf("  from: %s\n", name)
 				fmt.Printf("  to  : %s\n", newName)
@@ -138,7 +144,7 @@ func main() {
 				fmt.Println()
 			} else {
 				fmt.Printf("%s: moved\n",
-					style.Success.Render("success"),
+					style.RenderSuccess("success"),
 				)
 				fmt.Printf("  from: %s\n", name)
 				fmt.Printf("  to  : %s\n", newName)
