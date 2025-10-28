@@ -1,4 +1,4 @@
-package main
+package renamer
 
 import (
 	"testing"
@@ -7,7 +7,6 @@ import (
 )
 
 func TestExtractEpisode(t *testing.T) {
-
 	type Case struct {
 		Raw             string
 		ExpectedEpisode int
@@ -41,11 +40,9 @@ func TestExtractEpisode(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-
 		ep := extractEpisode(tc.Raw)
 		require.Equal(t, tc.ExpectedEpisode, ep)
 	}
-
 }
 
 func TestPadNumber(t *testing.T) {
@@ -72,6 +69,7 @@ func TestPadNumber(t *testing.T) {
 		require.Equal(t, tc.Expected, got, "num=%q width=%d", tc.Num, tc.Width)
 	}
 }
+
 func TestExtractOtherTags(t *testing.T) {
 	type Case struct {
 		Raw      string
