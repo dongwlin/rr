@@ -19,11 +19,18 @@ var (
 	show          = flag.String("show", "", "Show series name (required, no default)") // Must be specified
 	keepOtherTags = flag.Bool("keep-other-tags", true, "Preserve existing tags")
 	noColor       = flag.Bool("no-color", false, "Disable colored output")
+	help          = flag.Bool("help", false, "Show help message")
 )
 
 func main() {
 
 	flag.Parse()
+
+	if *help {
+		fmt.Println("Usage:")
+		flag.PrintDefaults()
+		return
+	}
 
 	// honor -no-color flag by disabling styled output
 	if *noColor {
