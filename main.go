@@ -18,6 +18,7 @@ var (
 	season        = flag.Int("season", 0, "Season number (required, no default)")      // Must be specified
 	show          = flag.String("show", "", "Show series name (required, no default)") // Must be specified
 	keepOtherTags = flag.Bool("keep-other-tags", true, "Preserve existing tags")
+	renumber      = flag.Bool("renumber", false, "Renumber episodes in ascending order starting from 1")
 	noColor       = flag.Bool("no-color", false, "Disable colored output")
 	help          = flag.Bool("help", false, "Show help message")
 )
@@ -71,9 +72,25 @@ func main() {
 		return
 	}
 
+	// Pre-scan all files so we can optionally renumber episodes consistently
+	// across multiple files that share the same original episode number (e.g.
+	// video + subtitle).
+	infos := make([]*renamer.NameInfo, 0, len(names))
+	infoByName := make(map[string]*renamer.NameInfo, len(names))
+	for _, name := range names {
+		info := renamer.GetNameInfo(name)
+		infos = append(infos, info)
+		infoByName[name] = info
+	}
+
+	var episodeMap map[int]int
+	if *renumber {
+		episodeMap = renamer.BuildEpisodeRenumberMap(infos)
+	}
+
 	for _, name := range names {
 		oldPath := filepath.Join(*inputDir, name)
-		info := renamer.GetNameInfo(name)
+		info := infoByName[name]
 
 		if info.Episode == -1 {
 			fmt.Printf("%s: cannot extract episode number, skipping:\n",
@@ -81,6 +98,12 @@ func main() {
 			)
 			fmt.Printf("  file: %s\n", name)
 			continue
+		}
+
+		if *renumber {
+			if newEp, ok := episodeMap[info.Episode]; ok {
+				info.Episode = newEp
+			}
 		}
 
 		newName := renamer.BuildScrapedName(*show, *season, info, *keepOtherTags)

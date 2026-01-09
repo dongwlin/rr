@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -151,6 +152,35 @@ func BuildScrapedName(showName string, season int, info *NameInfo, keepOtherTags
 	episodeStr := padNumber(fmt.Sprintf("%d", info.Episode), 2)
 
 	return fmt.Sprintf("%s S%sE%s%s%s", showName, seasonStr, episodeStr, otherTagsStr, info.Ext)
+}
+
+// BuildEpisodeRenumberMap builds a mapping of old episode numbers to new episode
+// numbers. Episodes are ordered ascending and re-numbered starting from 1.
+//
+// Example:
+//   old episodes: [3, 5, 5] -> map[3]=1, map[5]=2
+//
+// Entries with Episode < 0 (e.g. -1 meaning "not found") are ignored.
+func BuildEpisodeRenumberMap(infos []*NameInfo) map[int]int {
+	episodeSet := make(map[int]struct{})
+	for _, info := range infos {
+		if info == nil || info.Episode < 0 {
+			continue
+		}
+		episodeSet[info.Episode] = struct{}{}
+	}
+
+	episodes := make([]int, 0, len(episodeSet))
+	for ep := range episodeSet {
+		episodes = append(episodes, ep)
+	}
+	sort.Ints(episodes)
+
+	m := make(map[int]int, len(episodes))
+	for i, ep := range episodes {
+		m[ep] = i + 1
+	}
+	return m
 }
 
 // PadNumber returns num left-padded with zeros to the given width.

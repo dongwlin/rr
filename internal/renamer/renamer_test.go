@@ -100,3 +100,16 @@ func TestExtractOtherTags(t *testing.T) {
 		require.Equal(t, tc.Expected, got, "raw=%q", tc.Raw)
 	}
 }
+
+func TestBuildEpisodeRenumberMap(t *testing.T) {
+	infos := []*NameInfo{
+		{Episode: 3},
+		{Episode: 5},
+		{Episode: 5},
+		{Episode: -1},
+		nil,
+	}
+
+	got := BuildEpisodeRenumberMap(infos)
+	require.Equal(t, map[int]int{3: 1, 5: 2}, got)
+}
